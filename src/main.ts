@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -13,6 +13,8 @@ const createWindow = () => {
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      // enableRemoteModule: false,
     },
   });
 
@@ -48,6 +50,25 @@ app.on('activate', () => {
     createWindow();
   }
 });
+
+ipcMain.on('open-product-window', async (event, productId) => {
+  const productWindow = new BrowserWindow({
+    width: 400,
+    height: 600,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      // enableRemoteModule: false,
+    },
+  });
+
+  // Load product details HTML and pass the product ID
+  productWindow.loadFile(path.join(__dirname, '../renderer/product.html'));
+
+  // Send the product ID to the new window
+  productWindow.webContents.on('did-finish-load', () => {
+    productWindow.webContents.send('load-product-details', productId);
+  });
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.

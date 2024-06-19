@@ -31,6 +31,7 @@ import './index.css';
 console.log('👋 This message is being logged by "renderer.ts", included via Vite');
 
 // Fetch data from the API
+// Fetch data from the API
 async function fetchProducts() {
     try {
       const response = await fetch('https://fakestoreapi.com/products');
@@ -51,10 +52,21 @@ async function fetchProducts() {
           <p>${product.description}</p>
           <p>Price: $${product.price}</p>
           <img src="${product.image}" alt="${product.title}" />
+          <button onclick="viewProductDetails(${product.id})">View Details</button>
         </div>
       `).join('');
     }
   }
+  
+  // Function to handle viewing product details
+  function viewProductDetails(productId: number) {
+    window.electron.openProductWindow(productId);
+  }
+  
+  // Call the fetchProducts function when the window loads
+  window.onload = () => {
+    fetchProducts();
+  };
   
   // Call the fetchProducts function when the window loads
   window.onload = () => {
